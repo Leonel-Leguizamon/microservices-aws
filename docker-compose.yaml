@@ -1,0 +1,64 @@
+services:
+    eureka-msvc:
+        container_name: eureka-msvc
+        image: dlsoftware/eureka:latest
+        ports:
+            - "8761:8761"
+        build:
+            context: ./eureka-server
+            dockerfile: Dockerfile
+        networks:
+            - app-network
+
+    items-msvc:
+        container_name: items-msvc
+        image: dlsoftware/items:latest
+        ports:
+            - "8082:8082"
+#            - "8083:8083"
+#            - "8084:8084"
+        depends_on:
+            - eureka-msvc
+            - products-msvc
+        build:
+            context: ./items-msvc
+            dockerfile: Dockerfile
+        networks:
+            - app-network
+
+    products-msvc:
+#        container_name: products-msvc
+        image: dlsoftware/products:latest
+        deploy:
+            replicas: 1
+        depends_on:
+#            - db-products
+            - eureka-msvc
+        build:
+            context: ./products-msvc
+            dockerfile: Dockerfile
+        networks:
+            - app-network
+
+#    db-products:
+#        image: postgres:17-alpine
+#        container_name: db-products
+#        environment:
+#            POSTGRES_DB: products
+#            POSTGRES_USER: postgres
+#            POSTGRES_PASSWORD: postgres
+#            PGDATA: /data/pgdata
+#            PGTZ: America/Argentina/Buenos_Aires
+#        volumes:
+#            - products-postgres-data:/data/
+#        ports:
+#            - "5432:5432"
+#        restart: always
+#        networks:
+#            - app-network
+
+networks:
+    app-network:
+
+volumes:
+    products-postgres-data:

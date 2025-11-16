@@ -1,0 +1,65 @@
+spring:
+  application:
+    name: msvc-items
+
+  mvc:
+    contentnegotiation:
+      favor-path-extension: false
+      favor-parameter: true
+      media-types:
+        json: application/json
+      default-media-type: application/json
+  jackson:
+    time-zone: GMT-3
+  cloud:
+    loadbalancer:
+      enabled: true
+#    discovery:
+#      client:
+#        simple:
+#          instances:
+#            productClient:
+#              - uri: http://localhost:8080
+#              - uri: http://localhost:9080
+            # Al utilizar Eureka, no es necesario declarar las instancias de otras APIs
+server:
+  servlet:
+    context-path: /api-items
+  port: 8082
+
+feign:
+  clients:
+    products:
+      url: products-msvc:8080/api-products
+
+configs:
+  baseurls:
+    products: http://msvc-products/api-products # utiliza el nombre de la app
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://eureka-msvc:8761/eureka}
+
+# La configuracion del yml tiene mayor prioridad que el AppConfig
+resilience4j:
+  circuitbreaker:
+    configs:
+      custom-config:
+        sliding-window-size: 6
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 4
+        slow-call-duration-threshold: 3s
+        slow-call-rate-threshold: 5
+    instances:
+      items:
+        base-config: custom-config
+  timelimiter:
+    configs:
+      limiter:
+        timeout-duration: 2s
+    instances:
+      items:
+        base-config: limiter

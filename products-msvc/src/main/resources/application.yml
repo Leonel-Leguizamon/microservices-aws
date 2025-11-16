@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: msvc-products
+  datasource:
+    url: ${DB_PRODUCTS_URL:jdbc:postgresql://db-products:5432/products}
+    username: ${DB_PRODUCTS_USERNAME:postgres}
+    password: ${DB_PRODUCTS_PASSWORD:postgres}
+#    url: jdbc:postgresql://localhost:5432/products
+#    url: jdbc:postgresql://db-products:5432/products
+    driver-class-name: org.postgresql.Driver
+#    username: postgres
+#    password: postgres
+
+  flyway:
+    locations: classpath:db/migration
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+  mvc:
+    contentnegotiation:
+      favor-path-extension: false
+      favor-parameter: true
+      media-types:
+        json: application/json
+      default-media-type: application/json
+  jackson:
+    time-zone: GMT-3
+
+server:
+  servlet:
+    context-path: /api-products
+  port: ${PORT:0}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://eureka-msvc:8761/eureka}
+  instance:
+    instance-id: ${spring.cloud.client.hostname}:${spring.application.name}:${random.value}
+    prefer-ip-address: true
+    #Crea instancias con puerto aleatorio
