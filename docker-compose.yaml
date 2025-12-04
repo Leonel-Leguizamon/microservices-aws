@@ -29,6 +29,13 @@ services:
     products-msvc:
 #        container_name: products-msvc
         image: dlsoftware/products:latest
+        environment:
+            PORT: 8081
+            DB_PRODUCTS_URL: jdbc:postgresql://db-products.c50y60i2uawl.sa-east-1.rds.amazonaws.com:5432/products
+            DB_PRODUCTS_USERNAME: postgres
+            DB_PRODUCTS_PASSWORD: postgres
+        ports:
+            - "8081:8081"
         deploy:
             replicas: 1
         depends_on:
